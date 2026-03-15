@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulir Kas</title>
+    <title>Input Kas</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
@@ -12,75 +12,97 @@
             background-color: var(--tg-theme-bg-color, #ffffff);
             color: var(--tg-theme-text-color, #000000);
         }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; }
-        input, select {
-            width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="date"],
+        input[type="number"],
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
             box-sizing: border-box;
-            background-color: var(--tg-theme-secondary-bg-color, #f4f4f5);
+            background-color: var(--tg-theme-secondary-bg-color, #f1f1f1);
             color: var(--tg-theme-text-color, #000000);
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--tg-theme-button-color, #3390ec);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <h2>Input Kas Baru</h2>
+
+    <h2>Form Input Kas</h2>
+
     <div class="form-group">
-        <label>Tanggal:</label>
+        <label for="tanggal">Tanggal:</label>
         <input type="date" id="tanggal" required>
     </div>
+
     <div class="form-group">
-        <label>Kategori:</label>
-        <select id="kategori">
-            <option value="ATK">ATK</option>
-            <option value="Konsumsi">Konsumsi</option>
-            <option value="Transport">Transport</option>
-            <option value="Operasional">Operasional</option>
-            <option value="Kegiatan Dakwah">Kegiatan Dakwah</option>
-        </select>
+        <label for="keterangan">Keterangan:</label>
+        <input type="text" id="keterangan" placeholder="Contoh: Beli kertas HVS" required>
     </div>
+
     <div class="form-group">
-        <label>Keterangan:</label>
-        <input type="text" id="keterangan" placeholder="Contoh: Beli Kertas HVS" required>
+        <label for="pemasukan">Pemasukan (Rp):</label>
+        <input type="number" id="pemasukan" placeholder="Isi 0 jika tidak ada" value="0" required>
     </div>
+
     <div class="form-group">
-        <label>Pemasukan (Rp):</label>
-        <input type="number" id="pemasukan" value="0" required>
+        <label for="pengeluaran">Pengeluaran (Rp):</label>
+        <input type="number" id="pengeluaran" placeholder="Isi 0 jika tidak ada" value="0" required>
     </div>
-    <div class="form-group">
-        <label>Pengeluaran (Rp):</label>
-        <input type="number" id="pengeluaran" value="0" required>
-    </div>
-   
+
+    <button onclick="kirimData()">Kirim Data ke Bot</button>
 
     <script>
         // Inisialisasi Telegram Web App
         let tg = window.Telegram.WebApp;
-        tg.expand(); // Memperluas tampilan web app ke ukuran penuh
+        tg.expand(); // Memperluas tampilan form secara penuh
 
-        // Memunculkan tombol "Main Button" bawaan Telegram di bawah layar
-        tg.MainButton.setText("SIMPAN DATA KAS");
-        tg.MainButton.show();
+        // Set tanggal default ke hari ini
+        document.getElementById('tanggal').valueAsDate = new Date();
 
-        // Ketika tombol simpan ditekan
-        Telegram.WebApp.onEvent('mainButtonClicked', function(){
-            const data = {
-                tanggal: document.getElementById("tanggal").value,
-                kategori: document.getElementById("kategori").value,
-                keterangan: document.getElementById("keterangan").value,
-                pemasukan: document.getElementById("pemasukan").value,
-                pengeluaran: document.getElementById("pengeluaran").value,
-                saldo: document.getElementById("saldo").value
-            };
+        function kirimData() {
+            // Mengambil nilai dari form
+            let tanggal = document.getElementById('tanggal').value;
+            let keterangan = document.getElementById('keterangan').value;
+            let pemasukan = document.getElementById('pemasukan').value;
+            let pengeluaran = document.getElementById('pengeluaran').value;
 
             // Validasi sederhana
-            if(!data.tanggal || !data.keterangan || !data.saldo){
-                tg.showAlert("Mohon lengkapi semua data!");
+            if(!tanggal || !keterangan) {
+                tg.showAlert("Tanggal dan Keterangan harus diisi!");
                 return;
             }
 
-            // Mengirim data kembali ke bot Python sebagai string JSON
-            tg.sendData(JSON.stringify(data));
-        });
+            // Membungkus data menjadi format JSON
+            let dataKas = {
+                tanggal: tanggal,
+                keterangan: keterangan,
+                pemasukan: parseInt(pemasukan),
+                pengeluaran: parseInt(pengeluaran)
+            };
+
+            // Mengirim data kembali ke Bot Telegram
+            tg.sendData(JSON.stringify(dataKas));
+        }
     </script>
+
 </body>
 </html>
