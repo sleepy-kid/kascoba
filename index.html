@@ -36,39 +36,39 @@
         <button onclick="kirimKeBot()">Simpan Data</button>
     </div>
 
-    <script>
-        // Menyiapkan Telegram Web App
-        let tg = window.Telegram.WebApp;
-        tg.expand(); // Membuat form terbuka penuh di layar HP
 
-        function kirimKeBot() {
-            // Mengambil semua nilai dari kotak isian, termasuk yang tersembunyi
-            let jenis = document.getElementById("jenis_kas").value;
-            let tanggal = document.getElementById("tanggal_input").value;
-            let ket = document.getElementById("keterangan").value;
-            let masuk = document.getElementById("pemasukan").value || "0";
-            let keluar = document.getElementById("pengeluaran").value || "0";
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
 
-            // Peringatan jika tanggal atau keterangan kosong
-            if (!tanggal || !ket) {
-                tg.showAlert("Tanggal dan Keterangan wajib diisi!");
-                return;
-            }
+    document.getElementById('tanggal_input').valueAsDate = new Date();
 
-            // Membungkus data untuk dikirim ke Python
-            let dataDikirim = {
-                jenis_kas: jenis,
-                tanggal_input: tanggal,
-                keterangan: ket,
-                pemasukan: masuk,
-                pengeluaran: keluar
-            };
+    function sendData() {
+        let jenis = document.getElementById("jenis_kas").value;
+        let tanggal = document.getElementById('tanggal_input').value;
+        let kat = document.getElementById('kategori').value;
+        let ket = document.getElementById('keterangan').value;
+        let masuk = document.getElementById('pemasukan').value || "0";
+        let keluar = document.getElementById('pengeluaran').value || "0";
 
-            // Mengirim data dan menutup form
-            tg.sendData(JSON.stringify(dataDikirim));
-            tg.close();
+        if (!tanggal || !ket) {
+            tg.showAlert("Tanggal dan Keterangan wajib diisi!");
+            return;
         }
-    </script>
+
+        let dataDikirim = {
+            jenis_kas: jenis,
+            tanggal_input: tanggal,
+            kategori: kat,
+            keterangan: ket,
+            pemasukan: masuk,
+            pengeluaran: keluar
+        };
+
+        tg.sendData(JSON.stringify(dataDikirim));
+        tg.close();
+    }
+</script>
 
 </body>
 </html>
