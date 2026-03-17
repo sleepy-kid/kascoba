@@ -1,61 +1,74 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Catat Kas</title>
+    <title>Input Kas Masjid</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { font-family: sans-serif; padding: 20px; background-color: #f4f4f4; }
-        input, select, button { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
-        button { background-color: #0088cc; color: white; border: none; font-weight: bold; }
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f9; }
+        .container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h3 { text-align: center; color: #333; }
+        label { font-weight: bold; display: block; margin-top: 15px; }
+        input { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; background-color: #28a745; color: white; padding: 12px; margin-top: 20px; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
-    <h3>Catat Keuangan</h3>
-    <label>Tanggal:</label>
-    <input type="date" id="tanggal">
 
-  <label>Kategori:</label>
-<select id="kategori">
-    <option value="ATK">ATK</option>
-    <option value="Konsumsi">Konsumsi</option>
-    <option value="Transport">Transport</option>
-    <option value="Operasional">Operasional</option>
-    <option value="Kegiatan Dakwah">Kegiatan Dakwah</option>
-</select>
+    <div class="container">
+        <h3>🕌 Input Kas Masjid</h3>
+        
+        <input type="hidden" id="jenis_kas" value="kos">
 
+        <label>Tanggal:</label>
+        <input type="date" id="tanggal_input" required>
 
-    <label>Keterangan:</label>
-    <input type="text" id="keterangan" placeholder=".....">
+        <label>Keterangan:</label>
+        <input type="text" id="keterangan" placeholder="Contoh: Infaq Jumat" required>
 
-    <label>Pemasukan (Rp):</label>
-    <input type="number" id="pemasukan" placeholder="0">
+        <label>Pemasukan (Rp):</label>
+        <input type="number" id="pemasukan" placeholder="0">
 
-    <label>Pengeluaran (Rp):</label>
-    <input type="number" id="pengeluaran" placeholder="0">
+        <label>Pengeluaran (Rp):</label>
+        <input type="number" id="pengeluaran" placeholder="0">
 
-    <button onclick="sendData()">Simpan Data</button>
+        <button onclick="kirimKeBot()">Simpan Data</button>
+    </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+        // Menyiapkan Telegram Web App
+        let tg = window.Telegram.WebApp;
+        tg.expand(); // Membuat form terbuka penuh di layar HP
 
-        // Set default tanggal hari ini
-        document.getElementById('tanggal').valueAsDate = new Date();
+        function kirimKeBot() {
+            // Mengambil semua nilai dari kotak isian, termasuk yang tersembunyi
+            let jenis = document.getElementById("jenis_kas").value;
+            let tanggal = document.getElementById("tanggal_input").value;
+            let ket = document.getElementById("keterangan").value;
+            let masuk = document.getElementById("pemasukan").value || "0";
+            let keluar = document.getElementById("pengeluaran").value || "0";
 
-        function sendData() {
-            const data = {
-                tanggal: document.getElementById('tanggal').value,
-                kategori: document.getElementById('kategori').value,
-                keterangan: document.getElementById('keterangan').value,
-                pemasukan: document.getElementById('pemasukan').value,
-                pengeluaran: document.getElementById('pengeluaran').value
+            // Peringatan jika tanggal atau keterangan kosong
+            if (!tanggal || !ket) {
+                tg.showAlert("Tanggal dan Keterangan wajib diisi!");
+                return;
+            }
+
+            // Membungkus data untuk dikirim ke Python
+            let dataDikirim = {
+                jenis_kas: jenis,
+                tanggal_input: tanggal,
+                keterangan: ket,
+                pemasukan: masuk,
+                pengeluaran: keluar
             };
 
-            tg.sendData(JSON.stringify(data));
+            // Mengirim data dan menutup form
+            tg.sendData(JSON.stringify(dataDikirim));
             tg.close();
         }
     </script>
+
 </body>
 </html>
