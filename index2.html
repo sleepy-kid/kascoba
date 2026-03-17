@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Catat Kas 2 </title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background-color: #f4f4f4; }
+        input, select, button { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
+        button { background-color: #0088cc; color: white; border: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h3>Catat Keuangan</h3>
+    <label>Tanggal:</label>
+    <input type="date" id="tanggal">
+
+  <label>Kategori:</label>
+<select id="kategori">
+    <option value="ATK">ATK</option>
+    <option value="Konsumsi">Konsumsi</option>
+</select>
+
+
+    <label>Keterangan:</label>
+    <input type="text" id="keterangan" placeholder=".....">
+
+    <label>Pemasukan (Rp):</label>
+    <input type="number" id="pemasukan" placeholder="0">
+
+    <label>Pengeluaran (Rp):</label>
+    <input type="number" id="pengeluaran" placeholder="0">
+
+    <button onclick="sendData()">Simpan Data</button>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        // Set default tanggal hari ini
+        document.getElementById('tanggal').valueAsDate = new Date();
+
+        function sendData() {
+            const data = {
+                tanggal: document.getElementById('tanggal').value,
+                kategori: document.getElementById('kategori').value,
+                keterangan: document.getElementById('keterangan').value,
+                pemasukan: document.getElementById('pemasukan').value,
+                pengeluaran: document.getElementById('pengeluaran').value
+            };
+
+            tg.sendData(JSON.stringify(data));
+            tg.close();
+        }
+    </script>
+</body>
+</html>
