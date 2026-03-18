@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Catat Kas</title>
+    <title>Form Catat Kas Masjid</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body { font-family: sans-serif; padding: 20px; background-color: #f4f4f4; }
@@ -12,22 +12,24 @@
     </style>
 </head>
 <body>
-    <h3>Catat Keuangan</h3>
+    <h3>🕌 Catat Keuangan Masjid</h3>
+    
+    <input type="hidden" id="jenis_kas" value="masjid">
+
     <label>Tanggal:</label>
-    <input type="date" id="tanggal">
+    <input type="date" id="tanggal_input">
 
-  <label>Kategori:</label>
-<select id="kategori">
-    <option value="ATK">ATK</option>
-    <option value="Konsumsi">Konsumsi</option>
-    <option value="Transport">Transport</option>
-    <option value="Operasional">Operasional</option>
-    <option value="Kegiatan Dakwah">Kegiatan Dakwah</option>
-</select>
-
+    <label>Kategori:</label>
+    <select id="kategori">
+        <option value="ATK">ATK</option>
+        <option value="Konsumsi">Konsumsi</option>
+        <option value="Transport">Transport</option>
+        <option value="Operasional">Operasional</option>
+        <option value="Kegiatan Dakwah">Kegiatan Dakwah</option>
+    </select>
 
     <label>Keterangan:</label>
-    <input type="text" id="keterangan" placeholder=".....">
+    <input type="text" id="keterangan" placeholder="....." required>
 
     <label>Pemasukan (Rp):</label>
     <input type="number" id="pemasukan" placeholder="0">
@@ -42,18 +44,34 @@
         tg.expand();
 
         // Set default tanggal hari ini
-        document.getElementById('tanggal').valueAsDate = new Date();
+        document.getElementById('tanggal_input').valueAsDate = new Date();
 
         function sendData() {
-            const data = {
-                tanggal: document.getElementById('tanggal').value,
-                kategori: document.getElementById('kategori').value,
-                keterangan: document.getElementById('keterangan').value,
-                pemasukan: document.getElementById('pemasukan').value,
-                pengeluaran: document.getElementById('pengeluaran').value
+            // Mengambil semua data dari form HTML
+            let jenis = document.getElementById('jenis_kas').value;
+            let tgl = document.getElementById('tanggal_input').value;
+            let kat = document.getElementById('kategori').value;
+            let ket = document.getElementById('keterangan').value;
+            let masuk = document.getElementById('pemasukan').value || "0";
+            let keluar = document.getElementById('pengeluaran').value || "0";
+
+            if (!tgl || !ket) {
+                tg.showAlert("Tanggal dan Keterangan wajib diisi!");
+                return;
+            }
+
+            // Membungkus data sesuai dengan nama yang diminta test.py
+            const dataDikirim = {
+                jenis_kas: jenis,
+                tanggal_input: tgl,
+                kategori: kat,
+                keterangan: ket,
+                pemasukan: masuk,
+                pengeluaran: keluar
             };
 
-            tg.sendData(JSON.stringify(data));
+            // Mengirim ke bot
+            tg.sendData(JSON.stringify(dataDikirim));
             tg.close();
         }
     </script>
