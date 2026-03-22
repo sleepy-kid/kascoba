@@ -16,7 +16,7 @@
     <h3 id="judul_form">Catat Keuangan Baru</h3>
     
     <label>Tanggal:</label>
-    <input type="text" id="tanggal" placeholder="DD-MM-YYYY">
+    <input type="date" id="tanggal">
 
     <label>Kategori:</label>
     <select id="kategori">
@@ -44,7 +44,6 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Menangkap data dari URL jika ini adalah Mode Edit
         const urlParams = new URLSearchParams(window.location.search);
         const editRow = urlParams.get('row');
 
@@ -54,26 +53,46 @@
             document.getElementById('btn_simpan').innerText = "Update Data";
             document.getElementById('btn_simpan').classList.add('mode-edit');
             
-            document.getElementById('tanggal').value = urlParams.get('tanggal') || '';
+            let tglEdit = urlParams.get('tanggal');
+            // Menyesuaikan format DD-MM-YYYY ke format kalender YYYY-MM-DD
+            if (tglEdit && tglEdit.includes('-')) {
+                let parts = tglEdit.split('-');
+                if (parts[0].length === 2) { 
+                    document.getElementById('tanggal').value = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                } else {
+                    document.getElementById('tanggal').value = tglEdit.substring(0, 10);
+                }
+            }
+            
             document.getElementById('kategori').value = urlParams.get('kategori') || 'ATK';
             document.getElementById('keterangan').value = urlParams.get('keterangan') || '';
             document.getElementById('pemasukan').value = urlParams.get('pemasukan') || '0';
             document.getElementById('pengeluaran').value = urlParams.get('pengeluaran') || '0';
         } else {
             // --- MODE INPUT BARU ---
-            // Format tanggal DD-MM-YYYY
+            // Otomatis mengisi kalender dengan hari ini
             let today = new Date();
-            let dd = String(today.getDate()).padStart(2, '0');
-            let mm = String(today.getMonth() + 1).padStart(2, '0');
             let yyyy = today.getFullYear();
-            document.getElementById('tanggal').value = dd + '-' + mm + '-' + yyyy;
+            let mm = String(today.getMonth() + 1).padStart(2, '0');
+            let dd = String(today.getDate()).padStart(2, '0');
+            document.getElementById('tanggal').value = `${yyyy}-${mm}-${dd}`;
         }
 
         function sendData() {
+            // Mengambil tanggal dari kalender dan mengubahnya kembali jadi DD-MM-YYYY agar rapi di Telegram
+            let tglInput = document.getElementById('tanggal').value;
+            let tglKirim = tglInput; 
+            if (tglInput && tglInput.includes('-')) {
+                let p = tglInput.split('-');
+                if (p[0].length === 4) {
+                    tglKirim = `${p[2]}-${p[1]}-${p[0]}`; 
+                }
+            }
+
             const data = {
                 action: editRow ? 'edit' : 'new',
                 row: editRow,
-                tanggal: document.getElementById('tanggal').value,
+                tanggal: tglKirim,
                 kategori: document.getElementById('kategori').value,
                 keterangan: document.getElementById('keterangan').value,
                 pemasukan: document.getElementById('pemasukan').value || 0,
