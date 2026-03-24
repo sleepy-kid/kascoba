@@ -52,8 +52,6 @@
                     document.getElementById('tanggal').value = tglEdit.substring(0, 10);
                 }
             }
-            
-            document.getElementById('kategori').value = urlParams.get('kategori') || 'ATK';
             document.getElementById('keterangan').value = urlParams.get('keterangan') || '';
             document.getElementById('pemasukan').value = urlParams.get('pemasukan') || '0';
             document.getElementById('pengeluaran').value = urlParams.get('pengeluaran') || '0';
@@ -82,7 +80,6 @@
                 action: editRow ? 'edit' : 'new',
                 row: editRow,
                 tanggal: tglKirim,
-                kategori: document.getElementById('kategori').value,
                 keterangan: document.getElementById('keterangan').value,
                 pemasukan: document.getElementById('pemasukan').value || 0,
                 pengeluaran: document.getElementById('pengeluaran').value || 0
