@@ -43,7 +43,6 @@
             document.getElementById('btn_simpan').classList.add('mode-edit');
             
             let tglEdit = urlParams.get('tanggal');
-            // Menyesuaikan format DD-MM-YYYY ke format kalender YYYY-MM-DD
             if (tglEdit && tglEdit.includes('-')) {
                 let parts = tglEdit.split('-');
                 if (parts[0].length === 2) { 
@@ -52,12 +51,13 @@
                     document.getElementById('tanggal').value = tglEdit.substring(0, 10);
                 }
             }
+            
+            // Variabel Kategori sudah dihapus bersih dari sini
             document.getElementById('keterangan').value = urlParams.get('keterangan') || '';
             document.getElementById('pemasukan').value = urlParams.get('pemasukan') || '0';
             document.getElementById('pengeluaran').value = urlParams.get('pengeluaran') || '0';
         } else {
             // --- MODE INPUT BARU ---
-            // Otomatis mengisi kalender dengan hari ini
             let today = new Date();
             let yyyy = today.getFullYear();
             let mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -66,7 +66,6 @@
         }
 
         function sendData() {
-            // Mengambil tanggal dari kalender dan mengubahnya kembali jadi DD-MM-YYYY agar rapi di Telegram
             let tglInput = document.getElementById('tanggal').value;
             let tglKirim = tglInput; 
             if (tglInput && tglInput.includes('-')) {
@@ -80,6 +79,7 @@
                 action: editRow ? 'edit' : 'new',
                 row: editRow,
                 tanggal: tglKirim,
+                // Variabel Kategori sudah dihapus bersih dari sini
                 keterangan: document.getElementById('keterangan').value,
                 pemasukan: document.getElementById('pemasukan').value || 0,
                 pengeluaran: document.getElementById('pengeluaran').value || 0
