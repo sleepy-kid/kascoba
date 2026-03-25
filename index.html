@@ -78,8 +78,7 @@
             document.getElementById('tanggal').value = `${yyyy}-${mm}-${dd}`;
         }
 
-        function sendData() {
-            // Mengambil tanggal dari kalender dan mengubahnya kembali jadi DD-MM-YYYY agar rapi di Telegram
+                function sendData() {
             let tglInput = document.getElementById('tanggal').value;
             let tglKirim = tglInput; 
             if (tglInput && tglInput.includes('-')) {
@@ -89,19 +88,31 @@
                 }
             }
 
+            // MENGAMBIL ANGKA PEMASUKAN & PENGELUARAN
+            let nominalMasuk = Number(document.getElementById('pemasukan').value) || 0;
+            let nominalKeluar = Number(document.getElementById('pengeluaran').value) || 0;
+
+            // 🚨 SATPAM PENGECEK: JIKA KEDUANYA KOSONG ATAU NOL
+            if (nominalMasuk === 0 && nominalKeluar === 0) {
+                // Munculkan notifikasi bawaan Telegram
+                tg.showAlert("⚠️ Tunggu dulu! Pemasukan atau Pengeluaran wajib diisi salah satu.");
+                return; // 🛑 Berhenti di sini! Form tidak akan ditutup dan data tidak dikirim
+            }
+
             const data = {
                 action: editRow ? 'edit' : 'new',
                 row: editRow,
                 tanggal: tglKirim,
-                kategori: document.getElementById('kategori').value,
+                // Kategori: document.getElementById('kategori').value, // (Abaikan jika tabel Anda yang tanpa kategori)
                 keterangan: document.getElementById('keterangan').value,
-                pemasukan: document.getElementById('pemasukan').value || 0,
-                pengeluaran: document.getElementById('pengeluaran').value || 0
+                pemasukan: nominalMasuk,
+                pengeluaran: nominalKeluar
             };
 
             tg.sendData(JSON.stringify(data));
             tg.close();
         }
+
     </script>
 </body>
 </html>
