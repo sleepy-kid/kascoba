@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Bolo Order</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body class="bg-gray-100 p-4 font-sans">
+    <div class="max-w-md mx-auto">
+        <div class="mb-6 text-center">
+            <h1 class="text-2xl font-bold text-gray-800">📊 Laporan Penjualan</h1>
+            <p class="text-gray-500 text-sm">Periode: Maret 2026</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="bg-white rounded-xl shadow p-4 border-l-4 border-blue-500">
+                <p class="text-xs text-gray-500 font-bold">TOTAL OMZET</p>
+                <p class="text-lg font-extrabold text-gray-800">146 Juta</p>
+            </div>
+            <div class="bg-white rounded-xl shadow p-4 border-l-4 border-green-500">
+                <p class="text-xs text-gray-500 font-bold">TOTAL MARGIN</p>
+                <p class="text-lg font-extrabold text-gray-800">59 Juta</p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow p-4 mb-6">
+            <h2 class="text-sm font-bold text-gray-700 mb-2">📈 Tren Omzet Harian</h2>
+            <canvas id="lineChart" height="200"></canvas>
+        </div>
+
+        <div class="bg-white rounded-xl shadow p-4 mb-6">
+            <h2 class="text-sm font-bold text-gray-700 mb-2">🛒 Kategori Terlaris</h2>
+            <canvas id="pieChart" height="200"></canvas>
+        </div>
+
+        <button onclick="Telegram.WebApp.close()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-blue-700">
+            Tutup Dashboard
+        </button>
+    </div>
+
+    <script>
+        // Mengirim sinyal ke Telegram agar layarnya dibuka penuh
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand(); 
+
+        // 1. Menggambar Grafik Garis (Tren Omzet)
+        const ctxLine = document.getElementById('lineChart').getContext('2d');
+        new Chart(ctxLine, {
+            type: 'line',
+            data: {
+                labels: ['10 Mar', '11 Mar', '12 Mar', '13 Mar', '14 Mar', '15 Mar'], // Tanggal
+                datasets: [{
+                    label: 'Omzet (Juta Rp)',
+                    data: [12, 19, 15, 25, 22, 53], // Angka omzet per hari
+                    borderColor: 'rgb(59, 130, 246)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4 // Membuat garis melengkung halus (tidak kaku)
+                }]
+            },
+            options: { responsive: true }
+        });
+
+        // 2. Menggambar Grafik Donat (Produk Terlaris)
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        new Chart(ctxPie, {
+            type: 'doughnut',
+            data: {
+                labels: ['CCTV Ezviz', 'SSD VGEN', 'Service Kompor', 'Sparepart Lain'],
+                datasets: [{
+                    data: [40, 25, 20, 15], // Persentase penjualan
+                    backgroundColor: [
+                        'rgb(59, 130, 246)', // Biru
+                        'rgb(34, 197, 94)',  // Hijau
+                        'rgb(249, 115, 22)', // Orange
+                        'rgb(168, 85, 247)'  // Ungu
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: { responsive: true, cutout: '70%' }
+        });
+    </script>
+</body>
+</html>
