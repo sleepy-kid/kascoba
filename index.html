@@ -78,7 +78,7 @@
             document.getElementById('tanggal').value = `${yyyy}-${mm}-${dd}`;
         }
 
-                function sendData() {
+                        function sendData() {
             let tglInput = document.getElementById('tanggal').value;
             let tglKirim = tglInput; 
             if (tglInput && tglInput.includes('-')) {
@@ -92,18 +92,23 @@
             let nominalMasuk = Number(document.getElementById('pemasukan').value) || 0;
             let nominalKeluar = Number(document.getElementById('pengeluaran').value) || 0;
 
-            // 🚨 SATPAM PENGECEK: JIKA KEDUANYA KOSONG ATAU NOL
+            // 🚨 SATPAM 1: JIKA KEDUANYA KOSONG ATAU NOL
             if (nominalMasuk === 0 && nominalKeluar === 0) {
-                // Munculkan notifikasi bawaan Telegram
                 tg.showAlert("⚠️ Tunggu dulu! Pemasukan atau Pengeluaran wajib diisi salah satu.");
-                return; // 🛑 Berhenti di sini! Form tidak akan ditutup dan data tidak dikirim
+                return; 
+            }
+
+            // 🚨 SATPAM 2: JIKA KEDUANYA DIISI BERSAMAAN (BARU)
+            if (nominalMasuk > 0 && nominalKeluar > 0) {
+                tg.showAlert("⚠️ Tidak bisa diisi bersamaan! Silakan isi salah satu saja (Masuk ATAU Keluar).");
+                return; 
             }
 
             const data = {
                 action: editRow ? 'edit' : 'new',
                 row: editRow,
                 tanggal: tglKirim,
-                // Kategori: document.getElementById('kategori').value, // (Abaikan jika tabel Anda yang tanpa kategori)
+                kategori: document.getElementById('kategori').value, // (Sesuaikan jika ada/tidak ada kategori)
                 keterangan: document.getElementById('keterangan').value,
                 pemasukan: nominalMasuk,
                 pengeluaran: nominalKeluar
@@ -112,6 +117,7 @@
             tg.sendData(JSON.stringify(data));
             tg.close();
         }
+
 
     </script>
 </body>
