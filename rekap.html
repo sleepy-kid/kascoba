@@ -12,17 +12,17 @@
     <div class="max-w-md mx-auto">
         <div class="mb-6 text-center">
             <h1 class="text-2xl font-bold text-gray-800">📊 Laporan Penjualan</h1>
-            <p class="text-gray-500 text-sm">Periode: Maret 2026</p>
+            <p class="text-gray-500 text-sm" id="teks-bulan">Periode: Bulan Ini</p>
         </div>
 
         <div class="grid grid-cols-2 gap-4 mb-6">
             <div class="bg-white rounded-xl shadow p-4 border-l-4 border-blue-500">
                 <p class="text-xs text-gray-500 font-bold">TOTAL OMZET</p>
-                <p class="text-lg font-extrabold text-gray-800">146 Juta</p>
+                <p id="teks-omzet" class="text-lg font-extrabold text-gray-800">Menghitung...</p>
             </div>
             <div class="bg-white rounded-xl shadow p-4 border-l-4 border-green-500">
                 <p class="text-xs text-gray-500 font-bold">TOTAL MARGIN</p>
-                <p class="text-lg font-extrabold text-gray-800">59 Juta</p>
+                <p id="teks-margin" class="text-lg font-extrabold text-gray-800">Menghitung...</p>
             </div>
         </div>
 
@@ -32,53 +32,71 @@
         </div>
 
         <div class="bg-white rounded-xl shadow p-4 mb-6">
-            <h2 class="text-sm font-bold text-gray-700 mb-2">🛒 Kategori Terlaris</h2>
+            <h2 class="text-sm font-bold text-gray-700 mb-2">🛒 Kategori Terlaris (Contoh)</h2>
             <canvas id="pieChart" height="200"></canvas>
         </div>
-
-        <button onclick="Telegram.WebApp.close()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-blue-700">
-            Tutup Dashboard
-        </button>
     </div>
 
     <script>
-        // Mengirim sinyal ke Telegram agar layarnya dibuka penuh
-        window.Telegram.WebApp.ready();
-        window.Telegram.WebApp.expand(); 
+        // 1. Fungsi untuk merias angka menjadi format Rupiah (Titik pemisah ribuan)
+        function formatRupiah(angka) {
+            let number_string = angka.toString().replace(/[^,\d]/g, ''),
+                split = number_string.split(','),
+                sisa = split[0].length % 3,
+                rupiah = split[0].substr(0, sisa),
+                ribuan = split[0].substr(sisa).match(/\d{3}/gi);
 
-        // 1. Menggambar Grafik Garis (Tren Omzet)
+            if (ribuan) {
+                let separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
+            return 'Rp ' + rupiah;
+        }
+
+        // 2. MENGAMBIL ANGKA DARI UJUNG LINK GITHUB (DARI BOT TELEGRAM)
+        const urlParams = new URLSearchParams(window.location.search);
+        const dataOmzet = urlParams.get('omzet');
+        const dataMargin = urlParams.get('margin');
+
+        // 3. JIKA DATANYA ADA, GANTI TEKS DI LAYAR!
+        if (dataOmzet && dataMargin) {
+            document.getElementById('teks-omzet').innerText = formatRupiah(dataOmzet);
+            document.getElementById('teks-margin').innerText = formatRupiah(dataMargin);
+            
+            // Mengubah nama bulan secara otomatis sesuai HP
+            const namaBulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+            const d = new Date();
+            document.getElementById('teks-bulan').innerText = `Periode: ${namaBulan[d.getMonth()]} ${d.getFullYear()}`;
+        } else {
+            document.getElementById('teks-omzet').innerText = "Data Kosong";
+            document.getElementById('teks-margin').innerText = "Data Kosong";
+        }
+
+        // --- BAGIAN MENGGAMBAR GRAFIK DUMMY (SEMENTARA) ---
         const ctxLine = document.getElementById('lineChart').getContext('2d');
         new Chart(ctxLine, {
             type: 'line',
             data: {
-                labels: ['10 Mar', '11 Mar', '12 Mar', '13 Mar', '14 Mar', '15 Mar'], // Tanggal
+                labels: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
                 datasets: [{
-                    label: 'Omzet (Juta Rp)',
-                    data: [12, 19, 15, 25, 22, 53], // Angka omzet per hari
+                    label: 'Omzet',
+                    data: [12, 19, 15, 25], 
                     borderColor: 'rgb(59, 130, 246)',
                     backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4 // Membuat garis melengkung halus (tidak kaku)
+                    borderWidth: 2, fill: true, tension: 0.4 
                 }]
             },
             options: { responsive: true }
         });
 
-        // 2. Menggambar Grafik Donat (Produk Terlaris)
         const ctxPie = document.getElementById('pieChart').getContext('2d');
         new Chart(ctxPie, {
             type: 'doughnut',
             data: {
-                labels: ['CCTV Ezviz', 'SSD VGEN', 'Service Kompor', 'Sparepart Lain'],
+                labels: ['Barang A', 'Barang B', 'Barang C', 'Lainnya'],
                 datasets: [{
-                    data: [40, 25, 20, 15], // Persentase penjualan
-                    backgroundColor: [
-                        'rgb(59, 130, 246)', // Biru
-                        'rgb(34, 197, 94)',  // Hijau
-                        'rgb(249, 115, 22)', // Orange
-                        'rgb(168, 85, 247)'  // Ungu
-                    ],
+                    data: [40, 25, 20, 15], 
+                    backgroundColor: ['rgb(59, 130, 246)', 'rgb(34, 197, 94)', 'rgb(249, 115, 22)', 'rgb(168, 85, 247)'],
                     borderWidth: 0
                 }]
             },
