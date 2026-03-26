@@ -27,25 +27,23 @@
         </div>
 
         <div class="bg-white rounded-xl shadow p-4 mb-6">
-            <h2 class="text-sm font-bold text-gray-700 mb-2">📈 Tren Omzet Mingguan (Contoh)</h2>
+            <h2 class="text-sm font-bold text-gray-700 mb-2">📈 Tren Omzet 5 Bulan Terakhir</h2>
             <canvas id="lineChart" height="200"></canvas>
         </div>
 
         <div class="bg-white rounded-xl shadow p-4 mb-6">
-            <h2 id="judul-kategori" class="text-sm font-bold text-gray-700 mb-2">🛒 4 Kategori Terlaris</h2>
+            <h2 class="text-sm font-bold text-gray-700 mb-2">🛒 4 Kategori Terlaris Bulan Ini</h2>
             <canvas id="pieChart" height="200"></canvas>
         </div>
     </div>
 
     <script>
-        // 1. Fungsi merias angka menjadi format Rupiah
         function formatRupiah(angka) {
             let number_string = angka.toString().replace(/[^,\d]/g, ''),
                 split = number_string.split(','),
                 sisa = split[0].length % 3,
                 rupiah = split[0].substr(0, sisa),
                 ribuan = split[0].substr(sisa).match(/\d{3}/gi);
-
             if (ribuan) {
                 let separator = sisa ? '.' : '';
                 rupiah += separator + ribuan.join('.');
@@ -53,80 +51,55 @@
             return 'Rp ' + rupiah;
         }
 
-        // 2. Mengambil angka & teks dari ujung link URL
         const urlParams = new URLSearchParams(window.location.search);
         const dataOmzet = urlParams.get('omzet');
         const dataMargin = urlParams.get('margin');
+        
+        // Data Pie Chart
         const dataLabels = urlParams.get('labels');
         const dataValues = urlParams.get('values');
+        
+        // Data Line Chart
+        const dataLbl5 = urlParams.get('lbl5');
+        const dataVal5 = urlParams.get('val5');
 
-        // 3. Mengubah Angka Kartu Omzet & Tanggal
         if (dataOmzet && dataMargin) {
             document.getElementById('teks-omzet').innerText = formatRupiah(dataOmzet);
             document.getElementById('teks-margin').innerText = formatRupiah(dataMargin);
-            
             const namaBulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
             const d = new Date();
-            document.getElementById('teks-bulan').innerText = `Periode: ${namaBulan[d.getMonth()]} ${d.getFullYear()}`;
+            document.getElementById('teks-bulan').innerText = `Bulan Ini: ${namaBulan[d.getMonth()]} ${d.getFullYear()}`;
         }
 
-        // 4. MENGGAMBAR GRAFIK DONAT (BARANG TERLARIS)
-        let pieLabels = ['Belum Ada Data'];
-        let pieData = [1]; 
-        
-        // Jika bot berhasil mengirim nama barang, pecah komanya menjadi list
+        // --- MENGGAMBAR PIE CHART ---
+        let pieLabels = ['Belum Ada Data']; let pieData = [1]; 
         if (dataLabels && dataValues) {
-            pieLabels = dataLabels.split(',');
-            pieData = dataValues.split(',');
+            pieLabels = dataLabels.split(','); pieData = dataValues.split(',');
         }
-
-        const ctxPie = document.getElementById('pieChart').getContext('2d');
-        new Chart(ctxPie, {
+        new Chart(document.getElementById('pieChart').getContext('2d'), {
             type: 'doughnut',
-            data: {
-                labels: pieLabels,
-                datasets: [{
-                    data: pieData,
-                    backgroundColor: ['rgb(59, 130, 246)', 'rgb(34, 197, 94)', 'rgb(249, 115, 22)', 'rgb(168, 85, 247)'],
-                    borderWidth: 0
-                }]
-            },
+            data: { labels: pieLabels, datasets: [{ data: pieData, backgroundColor: ['rgb(59, 130, 246)', 'rgb(34, 197, 94)', 'rgb(249, 115, 22)', 'rgb(168, 85, 247)'], borderWidth: 0 }] },
             options: { 
-                responsive: true, 
-                cutout: '70%',
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            // Membuat pop-up angka di grafik menjadi format Rupiah
-                            label: function(context) {
-                                let label = context.label || '';
-                                if (label) { label += ': '; }
-                                if (context.parsed !== null) {
-                                    label += formatRupiah(context.parsed);
-                                }
-                                return label;
-                            }
-                        }
-                    }
-                }
+                responsive: true, cutout: '70%',
+                plugins: { tooltip: { callbacks: { label: function(c) { return (c.label ? c.label + ': ' : '') + formatRupiah(c.parsed); } } } }
             }
         });
 
-        // 5. Menggambar Grafik Garis (Ini masih contoh, bisa dikembangkan nanti)
-        const ctxLine = document.getElementById('lineChart').getContext('2d');
-        new Chart(ctxLine, {
+        // --- MENGGAMBAR LINE CHART (5 BULAN) ---
+        let lineLabels = ['Bulan 1', 'Bulan 2', 'Bulan 3', 'Bulan 4', 'Bulan 5']; let lineData = [0, 0, 0, 0, 0];
+        if (dataLbl5 && dataVal5) {
+            lineLabels = dataLbl5.split(','); lineData = dataVal5.split(',');
+        }
+        new Chart(document.getElementById('lineChart').getContext('2d'), {
             type: 'line',
             data: {
-                labels: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
-                datasets: [{
-                    label: 'Omzet',
-                    data: [12, 19, 15, 25], 
-                    borderColor: 'rgb(59, 130, 246)',
-                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                    borderWidth: 2, fill: true, tension: 0.4 
-                }]
+                labels: lineLabels,
+                datasets: [{ label: 'Omzet', data: lineData, borderColor: 'rgb(59, 130, 246)', backgroundColor: 'rgba(59, 130, 246, 0.2)', borderWidth: 2, fill: true, tension: 0.4 }]
             },
-            options: { responsive: true }
+            options: { 
+                responsive: true,
+                plugins: { tooltip: { callbacks: { label: function(c) { return 'Omzet: ' + formatRupiah(c.parsed.y); } } } }
+            }
         });
     </script>
 </body>
