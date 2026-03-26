@@ -30,6 +30,11 @@
             <h2 class="text-sm font-bold text-gray-700 mb-2">📈 Tren Omzet 5 Bulan Terakhir</h2>
             <canvas id="lineChart" height="200"></canvas>
         </div>
+        
+        <div class="bg-white rounded-xl shadow p-4 mb-6">
+            <h2 class="text-sm font-bold text-gray-700 mb-2">🏆 Top 5 Performa Sales (Bulan Ini)</h2>
+            <canvas id="barChart" height="200"></canvas>
+        </div>
 
         <div class="bg-white rounded-xl shadow p-4 mb-6">
             <h2 class="text-sm font-bold text-gray-700 mb-2">🛒 4 Kategori Terlaris Bulan Ini</h2>
@@ -55,13 +60,15 @@
         const dataOmzet = urlParams.get('omzet');
         const dataMargin = urlParams.get('margin');
         
-        // Data Pie Chart
         const dataLabels = urlParams.get('labels');
         const dataValues = urlParams.get('values');
         
-        // Data Line Chart
         const dataLbl5 = urlParams.get('lbl5');
         const dataVal5 = urlParams.get('val5');
+        
+        // Data Performa Sales
+        const dataSlbl = urlParams.get('slbl');
+        const dataSval = urlParams.get('sval');
 
         if (dataOmzet && dataMargin) {
             document.getElementById('teks-omzet').innerText = formatRupiah(dataOmzet);
@@ -71,7 +78,7 @@
             document.getElementById('teks-bulan').innerText = `Bulan Ini: ${namaBulan[d.getMonth()]} ${d.getFullYear()}`;
         }
 
-        // --- MENGGAMBAR PIE CHART ---
+        // --- 1. MENGGAMBAR PIE CHART (PRODUK) ---
         let pieLabels = ['Belum Ada Data']; let pieData = [1]; 
         if (dataLabels && dataValues) {
             pieLabels = dataLabels.split(','); pieData = dataValues.split(',');
@@ -79,22 +86,35 @@
         new Chart(document.getElementById('pieChart').getContext('2d'), {
             type: 'doughnut',
             data: { labels: pieLabels, datasets: [{ data: pieData, backgroundColor: ['rgb(59, 130, 246)', 'rgb(34, 197, 94)', 'rgb(249, 115, 22)', 'rgb(168, 85, 247)'], borderWidth: 0 }] },
-            options: { 
-                responsive: true, cutout: '70%',
-                plugins: { tooltip: { callbacks: { label: function(c) { return (c.label ? c.label + ': ' : '') + formatRupiah(c.parsed); } } } }
-            }
+            options: { responsive: true, cutout: '70%', plugins: { tooltip: { callbacks: { label: function(c) { return (c.label ? c.label + ': ' : '') + formatRupiah(c.parsed); } } } } }
         });
 
-        // --- MENGGAMBAR LINE CHART (5 BULAN) ---
+        // --- 2. MENGGAMBAR LINE CHART (5 BULAN) ---
         let lineLabels = ['Bulan 1', 'Bulan 2', 'Bulan 3', 'Bulan 4', 'Bulan 5']; let lineData = [0, 0, 0, 0, 0];
         if (dataLbl5 && dataVal5) {
             lineLabels = dataLbl5.split(','); lineData = dataVal5.split(',');
         }
         new Chart(document.getElementById('lineChart').getContext('2d'), {
             type: 'line',
+            data: { labels: lineLabels, datasets: [{ label: 'Omzet', data: lineData, borderColor: 'rgb(59, 130, 246)', backgroundColor: 'rgba(59, 130, 246, 0.2)', borderWidth: 2, fill: true, tension: 0.4 }] },
+            options: { responsive: true, plugins: { tooltip: { callbacks: { label: function(c) { return 'Omzet: ' + formatRupiah(c.parsed.y); } } } } }
+        });
+
+        // --- 3. MENGGAMBAR BAR CHART (PERFORMA SALES KARYAWAN) ---
+        let barLabels = ['Belum Ada Data']; let barData = [0];
+        if (dataSlbl && dataSval) {
+            barLabels = dataSlbl.split(','); barData = dataSval.split(',');
+        }
+        new Chart(document.getElementById('barChart').getContext('2d'), {
+            type: 'bar',
             data: {
-                labels: lineLabels,
-                datasets: [{ label: 'Omzet', data: lineData, borderColor: 'rgb(59, 130, 246)', backgroundColor: 'rgba(59, 130, 246, 0.2)', borderWidth: 2, fill: true, tension: 0.4 }]
+                labels: barLabels,
+                datasets: [{ 
+                    label: 'Total Omzet', 
+                    data: barData, 
+                    backgroundColor: 'rgba(34, 197, 94, 0.8)', // Warna Hijau Elegan
+                    borderRadius: 4
+                }]
             },
             options: { 
                 responsive: true,
