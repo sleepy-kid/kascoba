@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Rekap</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body class="bg-gray-100 p-4 font-sans text-gray-800">
+    <div class="max-w-md mx-auto bg-white rounded-xl shadow-md p-6 border-t-4 border-green-500">
+        <h2 class="text-xl font-bold mb-4 text-center">📊 Form Rekap Penjualan</h2>
+        <div class="mb-4">
+            <label class="block text-sm font-semibold mb-1 text-gray-600">📅 Dari Tanggal</label>
+            <input type="date" id="tgl_awal" class="w-full border border-gray-300 p-3 rounded-lg outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500">
+        </div>
+        <div class="mb-8">
+            <label class="block text-sm font-semibold mb-1 text-gray-600">📅 Sampai Tanggal</label>
+            <input type="date" id="tgl_akhir" class="w-full border border-gray-300 p-3 rounded-lg outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500">
+        </div>
+        <button onclick="kirimData()" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 active:scale-95 transition-transform shadow-lg">
+            🚀 Rekap Sekarang
+        </button>
+    </div>
+    <script>
+        let tg = window.Telegram.WebApp; tg.expand();
+        document.getElementById('tgl_akhir').valueAsDate = new Date();
+        let d = new Date(); d.setDate(1); document.getElementById('tgl_awal').valueAsDate = d;
+        
+        function kirimData() {
+            let tgl_awal = document.getElementById('tgl_awal').value;
+            let tgl_akhir = document.getElementById('tgl_akhir').value;
+            if (!tgl_awal || !tgl_akhir) { tg.showAlert("⚠️ Pilih tanggal terlebih dahulu!"); return; }
+            tg.sendData("REKAP|" + tgl_awal + "|" + tgl_akhir);
+        }
+    </script>
+</body>
+</html>
