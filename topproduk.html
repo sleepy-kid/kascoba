@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Top Produk</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -87,6 +90,9 @@
     </div>
 
     <script>
+        // Mendaftarkan ekstensi DataLabels ke dalam Chart.js
+        Chart.register(ChartDataLabels);
+
         // 1. Mengambil data dari URL (yang dikirim oleh bot Telegram)
         const urlParams = new URLSearchParams(window.location.search);
         
@@ -105,11 +111,17 @@
         const lbl_jsa = parseArray('lbl_jsa');
         const val_jsa = parseArray('val_jsa').map(Number);
 
-        // Konfigurasi umum agar grafik tampil rapi di HP
+        // Konfigurasi umum grafik
         const chartOptions = {
             responsive: true,
             maintainAspectRatio: false,
-            indexAxis: 'y', // Membuat grafik batangnya ke samping (horizontal)
+            indexAxis: 'y', // horizontal bar
+            layout: {
+                padding: {
+                    // Memberikan jarak ekstra di sisi kanan agar tulisan "unit" tidak terpotong layar
+                    right: 60 
+                }
+            },
             plugins: {
                 legend: { display: false },
                 tooltip: {
@@ -117,6 +129,19 @@
                         label: function(context) {
                             return ' Terjual: ' + context.parsed.x + ' Unit';
                         }
+                    }
+                },
+                // PENGATURAN TEKS DI UJUNG GRAFIK
+                datalabels: {
+                    color: '#2c3e50', // Warna teks
+                    anchor: 'end', // Posisi di ujung batang
+                    align: 'right', // Rata kanan (di luar batang)
+                    formatter: function(value) {
+                        return value + ' unit'; // Menambahkan kata "unit" di belakang angka
+                    },
+                    font: {
+                        weight: 'bold',
+                        size: 12
                     }
                 }
             },
