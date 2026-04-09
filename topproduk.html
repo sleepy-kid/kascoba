@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Top Produk</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+            font-size: 24px;
+        }
+        .header p {
+            margin: 0;
+            color: #7f8c8d;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+        .card h2 {
+            margin-top: 0;
+            color: #34495e;
+            font-size: 18px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px; 
+            width: 100%;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #95a5a6;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>🏆 Top Produk & Jasa Terjual</h1>
+            <p id="teksPeriode">Periode: Memuat...</p>
+        </div>
+
+        <div class="card">
+            <h2>📦 Top 10 Barang Fisik</h2>
+            <div class="chart-container" id="containerBarang">
+                <canvas id="chartBarang"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🛠️ Top 10 Jasa & Biaya</h2>
+            <div class="chart-container" id="containerJasa">
+                <canvas id="chartJasa"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. Mengambil data dari URL (yang dikirim oleh bot Telegram)
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        const periode = urlParams.get('periode') || 'Tidak Diketahui';
+        document.getElementById('teksPeriode').innerText = 'Periode: ' + periode;
+
+        // Fungsi bantu untuk memecah teks koma menjadi array
+        function parseArray(paramName) {
+            const val = urlParams.get(paramName);
+            return val ? val.split(',') : [];
+        }
+
+        const lbl_brg = parseArray('lbl_brg');
+        const val_brg = parseArray('val_brg').map(Number);
+        
+        const lbl_jsa = parseArray('lbl_jsa');
+        const val_jsa = parseArray('val_jsa').map(Number);
+
+        // Konfigurasi umum agar grafik tampil rapi di HP
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y', // Membuat grafik batangnya ke samping (horizontal)
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return ' Terjual: ' + context.parsed.x + ' Unit';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { beginAtZero: true, ticks: { stepSize: 1 } },
+                y: { ticks: { autoSkip: false, font: { size: 11 } } }
+            }
+        };
+
+        // 2. Membuat Grafik Barang Fisik
+        if (lbl_brg.length > 0 && val_brg.length > 0 && val_brg[0] > 0) {
+            const ctxBarang = document.getElementById('chartBarang').getContext('2d');
+            new Chart(ctxBarang, {
+                type: 'bar',
+                data: {
+                    labels: lbl_brg,
+                    datasets: [{
+                        label: 'Barang Fisik',
+                        data: val_brg,
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: chartOptions
+            });
+        } else {
+            document.getElementById('containerBarang').innerHTML = '<div class="empty-state">Belum ada data barang fisik yang terjual.</div>';
+        }
+
+        // 3. Membuat Grafik Jasa & Biaya
+        if (lbl_jsa.length > 0 && val_jsa.length > 0 && val_jsa[0] > 0) {
+            const ctxJasa = document.getElementById('chartJasa').getContext('2d');
+            new Chart(ctxJasa, {
+                type: 'bar',
+                data: {
+                    labels: lbl_jsa,
+                    datasets: [{
+                        label: 'Jasa & Biaya',
+                        data: val_jsa,
+                        backgroundColor: 'rgba(255, 159, 64, 0.7)',
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: chartOptions
+            });
+        } else {
+            document.getElementById('containerJasa').innerHTML = '<div class="empty-state">Belum ada data jasa/biaya yang terjual.</div>';
+        }
+    </script>
+</body>
+</html>
