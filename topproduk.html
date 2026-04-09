@@ -55,7 +55,7 @@
         }
         .chart-container {
             position: relative;
-            height: 400px; 
+            height: 500px; /* Dipertinggi sedikit agar muat kalau teksnya jadi 2 baris */
             width: 100%;
         }
         .empty-state {
@@ -118,7 +118,7 @@
             indexAxis: 'y', // horizontal bar
             layout: {
                 padding: {
-                    // Memberikan jarak ekstra di sisi kanan agar tulisan "unit" tidak terpotong layar
+                    left: 10, // Tambahan padding agar jarak ke tepi layar aman
                     right: 60 
                 }
             },
@@ -141,13 +141,39 @@
                     },
                     font: {
                         weight: 'bold',
-                        size: 12
+                        size: 11
                     }
                 }
             },
             scales: {
                 x: { beginAtZero: true, ticks: { stepSize: 1 } },
-                y: { ticks: { autoSkip: false, font: { size: 11 } } }
+                y: { 
+                    ticks: { 
+                        autoSkip: false, 
+                        font: { size: 10 },
+                        // FUNGSI AJAIB UNTUK MEMECAH TEKS PANJANG JADI 2 BARIS
+                        callback: function(value) {
+                            let label = this.getLabelForValue(value) || '';
+                            // Jika hurufnya lebih dari 22 karakter, pecah berdasarkan spasi ke baris baru
+                            if (label.length > 22) {
+                                let words = label.split(' ');
+                                let lines = [];
+                                let currentLine = '';
+                                for (let i = 0; i < words.length; i++) {
+                                    if ((currentLine + words[i]).length > 22) {
+                                        if (currentLine.length > 0) lines.push(currentLine.trim());
+                                        currentLine = words[i] + ' ';
+                                    } else {
+                                        currentLine += words[i] + ' ';
+                                    }
+                                }
+                                if (currentLine.trim().length > 0) lines.push(currentLine.trim());
+                                return lines;
+                            }
+                            return label;
+                        }
+                    } 
+                }
             }
         };
 
