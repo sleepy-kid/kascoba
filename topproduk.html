@@ -55,7 +55,7 @@
         }
         .chart-container {
             position: relative;
-            height: 500px; /* Dipertinggi sedikit agar muat kalau teksnya jadi 2 baris */
+            height: 500px; 
             width: 100%;
         }
         .empty-state {
@@ -90,16 +90,12 @@
     </div>
 
     <script>
-        // Mendaftarkan ekstensi DataLabels ke dalam Chart.js
         Chart.register(ChartDataLabels);
 
-        // 1. Mengambil data dari URL (yang dikirim oleh bot Telegram)
         const urlParams = new URLSearchParams(window.location.search);
-        
         const periode = urlParams.get('periode') || 'Tidak Diketahui';
         document.getElementById('teksPeriode').innerText = 'Periode: ' + periode;
 
-        // Fungsi bantu untuk memecah teks koma menjadi array
         function parseArray(paramName) {
             const val = urlParams.get(paramName);
             return val ? val.split(',') : [];
@@ -111,14 +107,13 @@
         const lbl_jsa = parseArray('lbl_jsa');
         const val_jsa = parseArray('val_jsa').map(Number);
 
-        // Konfigurasi umum grafik
         const chartOptions = {
             responsive: true,
             maintainAspectRatio: false,
-            indexAxis: 'y', // horizontal bar
+            indexAxis: 'y',
             layout: {
                 padding: {
-                    left: 10, // Tambahan padding agar jarak ke tepi layar aman
+                    left: 0, 
                     right: 60 
                 }
             },
@@ -131,13 +126,12 @@
                         }
                     }
                 },
-                // PENGATURAN TEKS DI UJUNG GRAFIK
                 datalabels: {
-                    color: '#2c3e50', // Warna teks
-                    anchor: 'end', // Posisi di ujung batang
-                    align: 'right', // Rata kanan (di luar batang)
+                    color: '#2c3e50',
+                    anchor: 'end',
+                    align: 'right',
                     formatter: function(value) {
-                        return value + ' unit'; // Menambahkan kata "unit" di belakang angka
+                        return value + ' unit';
                     },
                     font: {
                         weight: 'bold',
@@ -151,16 +145,15 @@
                     ticks: { 
                         autoSkip: false, 
                         font: { size: 10 },
-                        // FUNGSI AJAIB UNTUK MEMECAH TEKS PANJANG JADI 2 BARIS
                         callback: function(value) {
                             let label = this.getLabelForValue(value) || '';
-                            // Jika hurufnya lebih dari 22 karakter, pecah berdasarkan spasi ke baris baru
-                            if (label.length > 22) {
+                            // PERBAIKAN: Lipat teks lebih cepat (tiap 18 huruf)
+                            if (label.length > 18) {
                                 let words = label.split(' ');
                                 let lines = [];
                                 let currentLine = '';
                                 for (let i = 0; i < words.length; i++) {
-                                    if ((currentLine + words[i]).length > 22) {
+                                    if ((currentLine + words[i]).length > 18) {
                                         if (currentLine.length > 0) lines.push(currentLine.trim());
                                         currentLine = words[i] + ' ';
                                     } else {
@@ -177,7 +170,6 @@
             }
         };
 
-        // 2. Membuat Grafik Barang Fisik
         if (lbl_brg.length > 0 && val_brg.length > 0 && val_brg[0] > 0) {
             const ctxBarang = document.getElementById('chartBarang').getContext('2d');
             new Chart(ctxBarang, {
@@ -199,7 +191,6 @@
             document.getElementById('containerBarang').innerHTML = '<div class="empty-state">Belum ada data barang fisik yang terjual.</div>';
         }
 
-        // 3. Membuat Grafik Jasa & Biaya
         if (lbl_jsa.length > 0 && val_jsa.length > 0 && val_jsa[0] > 0) {
             const ctxJasa = document.getElementById('chartJasa').getContext('2d');
             new Chart(ctxJasa, {
